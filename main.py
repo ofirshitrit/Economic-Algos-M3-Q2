@@ -51,15 +51,28 @@ def weighted_round_rubin(rights, valuations, y):
 
 # Test cases
 if __name__ == "__main__":
-    # Test case
-    # weighted_round_rubin([1, 2, 4], [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]], 0.5)
+    """
+        1. Different objects with different rights
+        Inputs: 
+            rights = [1, 2, 4]
+            valuations = [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]]
+            y = 0.5
+        Expected Output:     
+            - Player 0 takes:
+               + item 2 with value 22
+            - Player 1 takes:
+               + item 3 with value 55
+            - Player 2 takes: 
+               + item 4 with value 66
+               + item 1 with value 33
+               + item 0 with value 11
 
-    # Additional test cases
-    # A. Identical objects with equal rights
-    # weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 1)
-    #
-    # # B. Same objects with different rights
+    """
+    weighted_round_rubin([1, 2, 4], [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]], 0.5)
+
+    # 2. Same objects with equal rights
+    weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 1)
+
+    # 3. Same objects with different rights
     weighted_round_rubin([1, 2, 3], [[10, 10, 10, 10, 10], [10, 10, 10, 10, 10], [10, 10, 10, 10, 10]], 0.5)
-    #
-    # # C. Different objects with different rights
-    # weighted_round_rubin([1, 3, 2], [[5, 10, 15], [20, 15, 10], [10, 5, 20]], 0.5)
+
