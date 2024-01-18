@@ -6,7 +6,7 @@ import sys
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
-# Comment this line to see prints
+# Comment this line to see prints of the logger
 logger.setLevel(logging.WARNING)
 
 """
