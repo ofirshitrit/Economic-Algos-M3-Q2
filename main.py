@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 # Comment this line to see prints
 logger.setLevel(logging.WARNING)
 
-
 """
 The Weights Round Rubin Algorithm:
 1. initialize: every player gets 0
@@ -17,6 +16,34 @@ The Weights Round Rubin Algorithm:
     - for every player compute: his right / his current number of objects + y  
     - the player that his portion is the highest gets to choose his favorite object
 """
+
+
+def get_choosing_player(num_players, players_chosen_objects, rights, y):
+    max_portion = 0
+    choosing_player = None
+
+    # Computing the portion for each player
+    for player in range(num_players):
+        portion = rights[player] / (players_chosen_objects[player] + y)
+        logger.info(f"Player {player} with portion: {portion}")
+
+        # Find the player with the highest portion
+        if portion > max_portion:
+            max_portion = portion
+            choosing_player = player
+
+    return choosing_player
+
+
+def get_chosen_object(valuations, choosing_player):
+    # The player with the highest portion choose from the remaining objects the object that he wants the most
+    max_value = float('-inf')
+    chosen_object = None
+    for i, value in enumerate(valuations[choosing_player]):
+        if value > max_value:
+            max_value = value
+            chosen_object = i
+    return chosen_object
 
 
 def weighted_round_rubin(rights, valuations, y):
@@ -31,37 +58,28 @@ def weighted_round_rubin(rights, valuations, y):
     players_chosen_objects = [0 for _ in range(num_players)]
 
     while remaining_objects:
-        max_portion = 0
-        choosing_player = None
-        chosen_object = None
-        max_value = float('-inf')
 
-        for player in range(num_players):
-            # Computing the portion for each player
-            portion = rights[player] / (players_chosen_objects[player] + y)
-            logger.info(f"Player {player} with portion: {portion}")
+        # Get the player with the highest portion to choose his favorite object
+        choosing_player = get_choosing_player(num_players, players_chosen_objects, rights, y)
 
-            # Find the player with the highest portion
-            if portion > max_portion:
-                max_portion = portion
-                choosing_player = player
+        # Get the favorite object of the player with the highest portion
+        chosen_object = get_chosen_object(valuations, choosing_player)
 
-        # The player with the highest portion choose from the remaining objects the object that he wants the most
-        for i, value in enumerate(valuations[choosing_player]):
-            if value > max_value:
-                max_value = value
-                chosen_object = i
-
+        # Update the player's number of objects
         players_chosen_objects[choosing_player] += 1
+
+        # Remove the chosen object
         remaining_objects.remove(chosen_object)
         logger.info(f"Remaining objects: {remaining_objects}")
 
         print(
-            f"Player {choosing_player} takes item {chosen_object} with value {valuations[choosing_player][chosen_object]}", flush=True)
+            f"Player {choosing_player} takes item {chosen_object} with value {valuations[choosing_player][chosen_object]}",
+            flush=True)
 
         # Remove the chosen value at the chosen_object index from each player's valuation
         for player in range(num_players):
             valuations[player][chosen_object] = 0
+
         logger.info(f"Valuations: {valuations}")
         logger.info(f"Players chosen objects: {players_chosen_objects}")
 
