@@ -19,13 +19,20 @@ The Weights Round Rubin Algorithm:
 
 
 def get_choosing_player(num_players, players_chosen_objects, rights, y):
-    max_portion = 0
+    """
+    Get the player with the highest portion to choose his favorite object.
+
+    >>> get_choosing_player(3, [1, 0, 2], [1, 2, 4], 0.5)
+    1
+
+    """
+
+    max_portion = float('-inf')
     choosing_player = None
 
     # Computing the portion for each player
     for player in range(num_players):
         portion = rights[player] / (players_chosen_objects[player] + y)
-        logger.info(f"Player {player} with portion: {portion}")
 
         # Find the player with the highest portion
         if portion > max_portion:
@@ -36,6 +43,13 @@ def get_choosing_player(num_players, players_chosen_objects, rights, y):
 
 
 def get_chosen_object(valuations, choosing_player):
+    """
+    Get the favorite object of the player with the highest portion.
+
+    >>> get_chosen_object([[11, 22, 33], [44, 55, 66], [77, 88, 99]], 1)
+    2
+
+    """
     # The player with the highest portion choose from the remaining objects the object that he wants the most
     max_value = float('-inf')
     chosen_object = None
@@ -47,6 +61,55 @@ def get_chosen_object(valuations, choosing_player):
 
 
 def weighted_round_rubin(rights, valuations, y):
+    """
+    Perform the Weights Round Rubin Algorithm.
+
+    >>> weighted_round_rubin([1, 2, 4], [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]], 0.5)
+    Player 2 takes item 4 with value 66
+    Player 1 takes item 3 with value 55
+    Player 2 takes item 1 with value 33
+    Player 0 takes item 2 with value 22
+    Player 2 takes item 0 with value 11
+
+    >>> weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 1)
+    Player 0 takes item 0 with value 10
+    Player 1 takes item 1 with value 10
+    Player 2 takes item 2 with value 10
+
+    >>> weighted_round_rubin([1, 2, 3], [[10, 10, 10, 10, 10], [10, 10, 10, 10, 10], [10, 10, 10, 10, 10]], 0.5)
+    Player 2 takes item 0 with value 10
+    Player 1 takes item 1 with value 10
+    Player 0 takes item 2 with value 10
+    Player 2 takes item 3 with value 10
+    Player 1 takes item 4 with value 10
+
+    >>> weighted_round_rubin([1.5, 1.5, 4], [[11.1, 11.1, 22, 33.5], [11.5, 22, 44, 55], [11.6, 33, 22.6, 11]], 0.2)
+    Player 2 takes item 1 with value 33
+    Player 0 takes item 3 with value 33.5
+    Player 1 takes item 2 with value 44
+    Player 2 takes item 0 with value 11.6
+
+    >>> weighted_round_rubin([1, 2, 3], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], -0.5)
+    Player 0 takes item 0 with value 10
+    Player 0 takes item 1 with value 10
+    Player 0 takes item 2 with value 10
+
+    >>> weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], -0.5)
+    Player 0 takes item 0 with value 10
+    Player 0 takes item 1 with value 10
+    Player 0 takes item 2 with value 10
+
+    >>> weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 2)
+    Player 0 takes item 0 with value 10
+    Player 1 takes item 1 with value 10
+    Player 2 takes item 2 with value 10
+
+    >>> weighted_round_rubin([1, 2, 3], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 2)
+    Player 2 takes item 0 with value 10
+    Player 1 takes item 1 with value 10
+    Player 2 takes item 2 with value 10
+
+    """
     num_players = len(rights)
     num_objects = len(valuations[0])
     remaining_objects = set(range(num_objects))
@@ -59,16 +122,12 @@ def weighted_round_rubin(rights, valuations, y):
 
     while remaining_objects:
 
-        # Get the player with the highest portion to choose his favorite object
         choosing_player = get_choosing_player(num_players, players_chosen_objects, rights, y)
 
-        # Get the favorite object of the player with the highest portion
         chosen_object = get_chosen_object(valuations, choosing_player)
 
-        # Update the player's number of objects
         players_chosen_objects[choosing_player] += 1
 
-        # Remove the chosen object
         remaining_objects.remove(chosen_object)
         logger.info(f"Remaining objects: {remaining_objects}")
 
@@ -82,69 +141,10 @@ def weighted_round_rubin(rights, valuations, y):
 
         logger.info(f"Valuations: {valuations}")
         logger.info(f"Players chosen objects: {players_chosen_objects}")
+    logger.info("\n")
 
-    print("\n")
 
-
-# Test cases
 if __name__ == "__main__":
-    """
-    1. Different objects with different rights
-    Inputs: 
-        rights = [1, 2, 4]
-        valuations = [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]]
-        y = 0.5
-    Expected Output:     
-        - Player 0 takes item 2
-        - Player 1 takes item 3
-        - Player 2 takes items 0,1,4
-    """
-    print("Different objects with different rights: ", flush=True)
-    weighted_round_rubin([1, 2, 4], [[11, 11, 22, 33, 44], [11, 22, 44, 55, 66], [11, 33, 22, 11, 66]], 0.5)
+    import doctest
 
-    """
-    2. Same objects with equal rights
-    Inputs: 
-        rights = [1, 1, 1]
-        valuations = [[10, 10, 10], [10, 10, 10], [10, 10, 10]]
-        y = 1
-    Expected Output:     
-         - Player 0 takes item 0
-         - Player 1 takes item 1
-         - Player 2 takes item 2    
-    """
-    print("Same objects with equal rights: ", flush=True)
-    weighted_round_rubin([1, 1, 1], [[10, 10, 10], [10, 10, 10], [10, 10, 10]], 1)
-
-    """
-    3. Same objects with different rights
-    Inputs: 
-        rights = [[1, 2, 3]]
-        valuations = [[10, 10, 10, 10, 10], [10, 10, 10, 10, 10], [10, 10, 10, 10, 10]]
-        y = 0.5
-    Expected Output:     
-         - Player 0 takes item 2
-         - Player 1 takes items 1,4
-         - Player 2 takes items 0,3 
-    """
-    print("Same objects with different rights: ", flush=True)
-    weighted_round_rubin([1, 2, 3], [[10, 10, 10, 10, 10], [10, 10, 10, 10, 10], [10, 10, 10, 10, 10]], 0.5)
-
-    """
-    4. Same objects with different rights - floats
-    """
-    print("Same objects with different rights: floats", flush=True)
-    weighted_round_rubin([1.5, 1.5, 4], [[11.1, 11.1, 22, 33.5], [11.5, 22, 44, 55], [11.6, 33, 22.6, 11]], 0.2)
-
-    """
-    5. Same objects with different rights - Random numbers
-    """
-    random_rights = [random.uniform(1.0, 10.0) for _ in range(4)]
-    print(f"Random rights: {random_rights} ", flush=True)
-    random_valuations = [[random.uniform(1.0, 50.0) for _ in range(3)] for _ in range(4)]
-    print(f"Random valuations: {random_valuations}", flush=True)
-    random_y = random.uniform(0.0, 1.0)
-    print(f"Random y: {random_y} ", flush=True)
-
-    print("Same objects with different rights - Random numbers", flush=True)
-    weighted_round_rubin(random_rights, random_valuations, random_y)
+    doctest.testmod()
